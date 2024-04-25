@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Post Blog</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
+          integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
+    <style>
+        .post-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .post-card {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .post-container button {
+            background-color: red;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.2rem;
+
+        }
+
+
+        .post-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .post-card p {
+            font-size: 1rem;
+            color: #666;
+        }
+
+        .post-card a {
+            text-decoration: none;
+            color: #007bff;
+        }
+
+        .post-card a:hover {
+            text-decoration: underline;
+        }
+
+        .post-details {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .post-details h4 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+        .post-details p {
+            font-size: 1.1rem;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .post-details hr {
+            border-top: 1px solid #ddd;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" onclick="displayAllPosts()" href="#">Posts</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+</nav>
+
+<div class="container">
+    <div id="content">
+
+    </div>
+
+    <div id="add-post-form" style="display: none;">
+        <h1 class="naslov">Add Post</h1>
+        <form id="post-form">
+            <div class="form-group">
+                <label for="post-title">Title</label>
+                <input type="text" class="form-control" id="post-title" placeholder="Enter title">
+
+                <label for="post-author">Author</label>
+                <input type="text" class="form-control" id="post-author" placeholder="Enter author">
+
+                <label for="post-content">Content</label>
+                <textarea class="form-control" id="post-content"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+    <br>
+    <div id="add-comment-form" style="display: none;">
+        <form id="comment-form" class = "post-details">
+            <div class="form-group">
+                <h4>Add Comment</h4>
+                <label for="comment-name">Name</label>
+                <input type="text" class="form-control" id="comment-name" placeholder="Enter Name">
+
+                <label for="comment-text">Comment</label>
+                <textarea class="form-control" id="comment-text" placeholder="Enter Comment"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Comment</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    let postId = 0
+    function formatContent(content, size) {
+        const maxLength = size;
+        const chunks = [];
+        for (let i = 0; i < content.length; i += maxLength) {
+            chunks.push(content.substring(i, i + maxLength));
+        }
+
+        return chunks.join('<br>');
+    }
+
+    function toggleAddPostForm() {
+        const contentDiv = document.getElementById('content');
+        contentDiv.innerHTML = '';
+        const form = document.getElementById('add-post-form');
+        form.style.display = 'block';
+    }
+    function clearPage()
+    {
+        const contentDiv = document.getElementById('content');
+        contentDiv.innerHTML = '';
+        contentDiv.className = '';
+        const form = document.getElementById('add-post-form');
+        form.style.display = 'none';
+        const commentForm = document.getElementById('add-comment-form');
+        commentForm.style.display = 'none';
+    }
+    function postDetails(id)
+    {
+        clearPage()
+        postId = id;
+        const contentDiv = document.getElementById('content');
+        contentDiv.innerHTML = `<h2> Post Details </h2> <br>`;
+        const commentForm = document.getElementById('add-comment-form');
+
+        fetch('/api/posts/' + id, {
+            method: 'GET'
+        }).then(response => {
+            return response.json();
+        }).then(post => {
+            const postDiv = document.createElement('div');
+            postDiv.className = 'post-details';
+            postDiv.innerHTML = `
+                    <h4>${formatContent(post.title,70)}</h4>
+                    <p>${post.date}</p>
+                    <p><i>${formatContent(post.author,110)}</i></p>
+                    <p>${formatContent(post.content,110)}</p>
+
+                    <hr>
+                    <h3>Comments</h3>
+                    <hr>
+
+                `;
+            const commentsDiv = document.createElement('commentDiv');
+            fetch('/api/comments/' + id, {
+                method: 'GET'
+            }).then(response => {
+                return response.json();
+            }).then(comments => {
+                comments.forEach(comment => {
+                    const commentDiv = document.createElement('div');
+                    commentDiv.innerHTML = `
+                        <h5>${formatContent(comment.name,110)}</h5>
+                        <p>${formatContent(comment.text,120)}</p>
+                        <hr>
+                    `;
+                    commentsDiv.appendChild(commentDiv);
+                });
+            });
+            postDiv.appendChild(commentsDiv);
+            contentDiv.appendChild(postDiv);
+            commentForm.style.display = 'block';
+
+        });
+
+
+    }
+    function displayAllPosts() {
+        clearPage()
+        const contentDiv = document.getElementById('content');
+        contentDiv.className = 'post-container';
+
+        fetch('/api/posts', {
+            method: 'GET'
+        }).then(response => {
+            return response.json();
+        }).then(posts => {
+            contentDiv.innerHTML = `<h2> All Posts </h2> <button onclick="toggleAddPostForm()" >New Post</button><br><br><br>`
+            posts.forEach(post => {
+                const postDiv = document.createElement('div');
+                postDiv.className = 'post-card';
+                postDiv.innerHTML = `
+                    <h3><a onclick="postDetails(${post.id})" href="#">${formatContent(post.title, 20)}</a></h3>
+                    <p>${formatContent(post.content.substring(0, post.content.length > 250 ? 247 : post.content.length) + "..", 40)}</p>
+                    <p>More..</p>
+                    <hr>
+                `;
+                contentDiv.appendChild(postDiv);
+            });
+        });
+    }
+
+    displayAllPosts();
+
+    document.getElementById("post-form").addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const postTitleElement = document.getElementById('post-title');
+        const contentElement = document.getElementById('post-content');
+        const authorElement = document.getElementById('post-author');
+
+
+        const title = postTitleElement.value;
+        const content = contentElement.value;
+        const author = authorElement.value;
+        const currentDate = new Date().toISOString();
+
+        fetch('/api/posts', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                title: title,
+                content: content,
+                author: author,
+                date: currentDate
+            })
+        }).then(response => {
+            return response.json();
+        }).then(post => {
+
+            displayAllPosts();
+
+            postTitleElement.value = '';
+            contentElement.value = '';
+            authorElement.value = '';
+
+        });
+    });
+    document.getElementById("comment-form").addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const commentNameElement = document.getElementById('comment-name');
+        const commentTextElement = document.getElementById('comment-text');
+
+        const name = commentNameElement.value;
+        const text = commentTextElement.value;
+
+
+        fetch('/api/comments', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                name: name,
+                text: text,
+                postId: postId
+            })
+        }).then(response => {
+            return response.json();
+        }).then(comment => {
+            postDetails(postId);
+            commentNameElement.value = '';
+            commentTextElement.value = '';
+        });
+    });
+</script>
+
+</body>
+</html>
