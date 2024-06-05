@@ -20,13 +20,14 @@ public class Comment {
     private String text;
     public Comment() {
     }
-    public Comment(String name, String text) {
+    public Comment(String name, String text, Integer postId) {
         this();
         this.name = name;
         this.text = text;
+        this.postId = postId;
     }
-    public Comment(Integer id, String name, String text) {
-        this(name, text);
+    public Comment(Integer id, String name, String text, Integer postId) {
+        this(name, text, postId);
         this.id = id;
     }
     @Override

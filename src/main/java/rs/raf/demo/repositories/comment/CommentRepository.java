@@ -1,4 +1,4 @@
-package rs.raf.demo.repositories.subject;
+package rs.raf.demo.repositories.comment;
 
 import rs.raf.demo.entities.Comment;
 

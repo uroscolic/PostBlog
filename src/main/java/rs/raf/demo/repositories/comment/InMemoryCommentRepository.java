@@ -1,12 +1,13 @@
-package rs.raf.demo.repositories.subject;
+package rs.raf.demo.repositories.comment;
 
 import rs.raf.demo.entities.Comment;
+import rs.raf.demo.repositories.comment.CommentRepository;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
-public class InMemoryCommentRepository implements CommentRepository{
+public class InMemoryCommentRepository implements CommentRepository {
     private static List<Comment> comments = new CopyOnWriteArrayList<>();
     public InMemoryCommentRepository() {
         System.out.println("Creating InMemoryCommentRepository");

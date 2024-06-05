@@ -1,7 +1,7 @@
 package rs.raf.demo.services;
 
 import rs.raf.demo.entities.Post;
-import rs.raf.demo.repositories.subject.PostRepository;
+import rs.raf.demo.repositories.post.PostRepository;
 
 import javax.inject.Inject;
 import java.util.List;

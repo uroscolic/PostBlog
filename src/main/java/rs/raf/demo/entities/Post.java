@@ -27,7 +27,7 @@ public class Post {
     public Post() {
     }
 
-    public Post(String title, String content, String author, String date) {
+    public Post(String title, String content, String date, String author) {
         this();
         this.title = title;
         this.content = content;
@@ -36,8 +36,18 @@ public class Post {
     }
 
     public Post(Integer id, String title, String content, String author, String date) {
-        this(title, content, author, date);
+        this(title, content, date, author);
         this.id = id;
+    }
+    @Override
+    public String toString() {
+        return "Post{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", content='" + content + '\'' +
+                ", author='" + author + '\'' +
+                ", date='" + date + '\'' +
+                '}';
     }
 
 }
